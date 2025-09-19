@@ -41,20 +41,18 @@ jobs:
         echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
         echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
     
-    - name: Initialize Android build
+    # Clean previous artifacts (optional)
+    - name: Clean Android build artifacts
       run: |
         cd src/misc/android
-        make init
+        make clean || true
     
     - name: Build Android APK
       run: |
         cd src/misc/android
         make apk
     
-    - name: Sign APK (for testing)
-      run: |
-        cd src/misc/android
-        make signed
+    # Upload only unsigned APKs as requested
     
     - name: Upload APK artifacts
       uses: actions/upload-artifact@v4
