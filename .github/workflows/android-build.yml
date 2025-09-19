@@ -32,193 +32,35 @@ jobs:
     - name: Install dependencies
       run: |
         sudo apt-get update
-        sudo apt-get install -y cmake build-essential
+        sudo apt-get install -y cmake build-essential make
     
-    - name: Create build directory
-      run: mkdir build
-    
-    - name: Configure CMake for Android
+    - name: Set up Android build environment
       run: |
-        cd build
-        cmake .. -DCMAKE_BUILD_TYPE=Release \
-                 -DCMAKE_TOOLCHAIN_FILE=$ANDROID_NDK_ROOT/build/cmake/android.toolchain.cmake \
-                 -DANDROID_ABI=arm64-v8a \
-                 -DANDROID_PLATFORM=android-21
+        export ANDROID_HOME=$ANDROID_SDK_ROOT
+        export ANDROID_NDK_ROOT=$ANDROID_HOME/ndk/27.3.13750724
+        echo "ANDROID_HOME=$ANDROID_HOME" >> $GITHUB_ENV
+        echo "ANDROID_NDK_ROOT=$ANDROID_NDK_ROOT" >> $GITHUB_ENV
     
-    - name: Build Android Library
+    - name: Initialize Android build
       run: |
-        cd build
-        make -j$(nproc)
+        cd src/misc/android
+        make init
     
-    - name: Create APK directory structure
+    - name: Build Android APK
       run: |
-        mkdir -p android-build/app/src/main/assets
-        mkdir -p android-build/app/src/main/jniLibs/arm64-v8a
-        mkdir -p android-build/app/src/main/res/values
+        cd src/misc/android
+        make apk
     
-    - name: Copy game assets
+    - name: Sign APK (for testing)
       run: |
-        cp -r characters fonts images inputs languages levels licenses musics quests samples scripts sprites themes android-build/app/src/main/assets/
-        cp LICENSE README.md CHANGES.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg android-build/app/src/main/assets/
-    
-    - name: Copy native library
-      run: |
-        cp build/libopensurge.so android-build/app/src/main/jniLibs/arm64-v8a/
-    
-    - name: Create AndroidManifest.xml
-      run: |
-        cat > android-build/app/src/main/AndroidManifest.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-            package="org.opensurge2d.surgeengine">
-            <uses-permission android:name="android.permission.INTERNET" />
-            <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
-            <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-            <application
-                android:allowBackup="true"
-                android:icon="@mipmap/ic_launcher"
-                android:label="@string/app_name"
-                android:theme="@style/AppTheme">
-                <activity
-                    android:name="org.opensurge2d.surgeengine.MainActivity"
-                    android:exported="true"
-                    android:screenOrientation="landscape"
-                    android:configChanges="orientation|keyboardHidden|screenSize">
-                    <intent-filter>
-                        <action android:name="android.intent.action.MAIN" />
-                        <category android:name="android.intent.category.LAUNCHER" />
-                    </intent-filter>
-                </activity>
-            </application>
-        </manifest>
-        EOF
-    
-    - name: Create strings.xml
-      run: |
-        cat > android-build/app/src/main/res/values/strings.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <resources>
-            <string name="app_name">Open Surge Engine</string>
-        </resources>
-        EOF
-    
-    - name: Create build.gradle
-      run: |
-        cat > android-build/app/build.gradle << 'EOF'
-        plugins {
-            id 'com.android.application'
-        }
-        
-        android {
-            compileSdk 34
-            ndkVersion "25.1.8937393"
-            
-            defaultConfig {
-                applicationId "org.opensurge2d.surgeengine"
-                minSdk 21
-                targetSdk 34
-                versionCode 1
-                versionName "0.6.1.3"
-                
-                ndk {
-                    abiFilters 'arm64-v8a'
-                }
-            }
-            
-            buildTypes {
-                debug {
-                    debuggable true
-                    minifyEnabled false
-                }
-                release {
-                    debuggable false
-                    minifyEnabled false
-                }
-            }
-            
-            sourceSets {
-                main {
-                    jniLibs.srcDirs = ['src/main/jniLibs']
-                    assets.srcDirs = ['src/main/assets']
-                }
-            }
-        }
-        
-        dependencies {
-            implementation 'androidx.appcompat:appcompat:1.6.1'
-        }
-        EOF
-    
-    - name: Create MainActivity.java
-      run: |
-        mkdir -p android-build/app/src/main/java/org/opensurge2d/surgeengine
-        cat > android-build/app/src/main/java/org/opensurge2d/surgeengine/MainActivity.java << 'EOF'
-        package org.opensurge2d.surgeengine;
-        
-        import android.app.Activity;
-        import android.os.Bundle;
-        
-        public class MainActivity extends Activity {
-            static {
-                System.loadLibrary("opensurge");
-            }
-            
-            @Override
-            protected void onCreate(Bundle savedInstanceState) {
-                super.onCreate(savedInstanceState);
-                setContentView(R.layout.activity_main);
-            }
-        }
-        EOF
-    
-    - name: Create activity_main.xml
-      run: |
-        mkdir -p android-build/app/src/main/res/layout
-        cat > android-build/app/src/main/res/layout/activity_main.xml << 'EOF'
-        <?xml version="1.0" encoding="utf-8"?>
-        <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Open Surge Engine"
-                android:layout_centerInParent="true" />
-        </RelativeLayout>
-        EOF
-    
-    - name: Create project build.gradle
-      run: |
-        cat > android-build/build.gradle << 'EOF'
-        plugins {
-            id 'com.android.application' version '8.1.0' apply false
-        }
-        EOF
-    
-    - name: Create settings.gradle
-      run: |
-        cat > android-build/settings.gradle << 'EOF'
-        include ':app'
-        EOF
-    
-    - name: Create gradle.properties
-      run: |
-        cat > android-build/gradle.properties << 'EOF'
-        org.gradle.jvmargs=-Xmx2048m -Dfile.encoding=UTF-8
-        android.useAndroidX=true
-        android.enableJetifier=true
-        EOF
-    
-    - name: Build APK
-      run: |
-        cd android-build
-        ./gradlew assemble${{ matrix.build-type }}
+        cd src/misc/android
+        make signed
     
     - name: Upload APK artifacts
       uses: actions/upload-artifact@v4
       with:
         name: opensurge-android-${{ matrix.build-type }}
-        path: android-build/app/build/outputs/apk/${{ matrix.build-type }}/app-${{ matrix.build-type }}.apk
+        path: src/misc/android/build/*.apk
         retention-days: 30
     
     - name: Upload debug info
@@ -226,7 +68,5 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: opensurge-android-debug-info
-        path: |
-          build/libopensurge.so
-          android-build/app/build/outputs/mapping/debug/
+        path: src/misc/android/build/
         retention-days: 30
