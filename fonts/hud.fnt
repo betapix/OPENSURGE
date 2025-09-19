@@ -1,0 +1,9 @@
+// -----------------------------------------------------------------------------
+// File: hud.fnt
+// Description: script of the font of the Heads-Up Display
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "HUD" is "GoodNeighbors"
+font "HUD Large" is "GoodNeighborsLarge"

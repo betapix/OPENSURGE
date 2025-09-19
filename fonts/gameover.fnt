@@ -1,0 +1,8 @@
+// -----------------------------------------------------------------------------
+// File: gameover.fnt
+// Description: script of the Game Over font
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "gameover" is "GoodNeighborsLarge"

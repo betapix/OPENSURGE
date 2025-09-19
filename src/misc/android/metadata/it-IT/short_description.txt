@@ -1,0 +1,1 @@
+Un motore di gioco retrò con un divertente platform ispirato ai giochi di Sonic a 16 bit.

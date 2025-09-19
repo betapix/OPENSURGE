@@ -1,0 +1,13 @@
+// -----------------------------------------------------------------------------
+// File: create.qst
+// Description: a quest for the Create option at the Main Menu
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// quest data
+name            "Create quest"
+
+// level list
+quest           "quests/demo.qst"
+level           "levels/scenes/thanks_for_playing.lev"

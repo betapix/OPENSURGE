@@ -1,0 +1,9 @@
+// -----------------------------------------------------------------------------
+// File: title_screen.fnt
+// Description: script of the fonts used at the Title Screen
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Title Screen - Menu Item" is "GoodNeighbors"
+font "Title Screen - Tiny Text" is "BoxyBold"

@@ -1,0 +1,76 @@
+// Open Surge Engine
+// http://opensurge2d.org
+// Fonts used on various menus
+
+font "MenuTitle" is "GoodNeighborsLarge"
+font "MenuText" is "GoodNeighbors"
+font "MenuSmall" is "BoxyBold"
+font "MenuBold" is "GoodNeighbors"
+font "MenuButton" is "GoodNeighborsLarge"
+
+/*
+
+//
+// TrueType definitions
+//
+
+// menu: title
+font "MenuTitle"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    28
+        antialias
+        shadow
+    }
+}
+
+// menu: general texts
+font "MenuText"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Bold.ttf"
+        size                    15
+        shadow
+        antialias
+    }
+}
+
+// menu: small
+font "MenuSmall"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Medium.ttf"
+        size                    10
+        shadow
+    }
+}
+
+// menu: bold
+font "MenuBold"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Bold.ttf"
+        size                    17
+        shadow
+        antialias
+    }
+}
+
+// menu: button
+font "MenuButton"
+{
+    truetype
+    {
+        source_file             "fonts/Roboto-Black.ttf"
+        size                    28
+        antialias
+        shadow
+    }
+}
+
+*/

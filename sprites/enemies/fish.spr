@@ -1,0 +1,25 @@
+// -----------------------------------------------------------------------------
+// File: fish.spr
+// Description: Fish sprite script
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+// art by Alexandre
+sprite "Fish"
+{
+    source_file     "images/enemies/waterworks_zone.png"
+    source_rect     16 448 96 32
+    frame_size      48 32
+    hot_spot        24 16
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         6
+        data        0 1
+    }
+}
+
+
+

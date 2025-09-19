@@ -1,0 +1,43 @@
+// -----------------------------------------------------------------------------
+// File: thanks_for_playing.spr
+// Description: sprite script - "Thanks for Playing" scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+sprite "Thanks for Playing - Pointer"
+{
+    source_file     "images/scenes/thanks_for_playing.png"
+    source_rect     0 176 23 21
+    frame_size      23 21
+    hot_spot        28 17
+
+    animation 0
+    {
+        repeat      TRUE
+        fps         8
+        data        0
+        play        "pointing"
+    }
+
+    keyframes "pointing"
+    {
+        duration            1.0
+        easing              "ease_in_out"
+
+        keyframe 0%
+        {
+            translation     3 3
+        }
+
+        keyframe 50%
+        {
+            translation     -3 0
+        }
+
+        keyframe 100%
+        {
+            translation     3 3
+        }
+    }
+}

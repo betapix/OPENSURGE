@@ -1,0 +1,8 @@
+// -----------------------------------------------------------------------------
+// File: loading.fnt
+// Description: script of the loading screen font
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Loading" is "GoodNeighbors"

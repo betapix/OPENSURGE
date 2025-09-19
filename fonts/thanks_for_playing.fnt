@@ -1,0 +1,9 @@
+// -----------------------------------------------------------------------------
+// File: thanks_for_playing.fnt
+// Description: script of the fonts used at the Thanks for Playing scene
+// Author: Alexandre Martins <http://opensurge2d.org>
+// License: MIT
+// -----------------------------------------------------------------------------
+
+font "Thanks for Playing - Text" is "GoodNeighbors"
+font "Thanks for Playing - Title" is "GoodNeighborsLarge"

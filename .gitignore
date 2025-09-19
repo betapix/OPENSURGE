@@ -1,0 +1,40 @@
+# Specifies intentionally untracked files to ignore when using Git
+# http://git-scm.com/docs/gitignore
+
+# vscode
+.vscode
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# msvc
+.vs/
+CMakeSettings.json
+out/
+
+# vim
+[._]*.s[a-v][a-z]
+[._]*.sw[a-p]
+[._]s[a-v][a-z]
+[._]sw[a-p]
+Session.vim
+.netrwhist
+*~
+
+# opensurge
+!src/**
+build/
+CMakeFiles/
+screenshots/*.png
+.userdata/
+opensurge
+opensurge.exe
+surge.prefs
+logfile.txt
+allegro5.cfg
+allegro.log
+*.dll
+*.pdb
+gmon.out
