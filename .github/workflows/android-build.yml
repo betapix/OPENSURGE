@@ -20,14 +20,20 @@ jobs:
       with:
         submodules: recursive
     
-    - name: Setup Java (JDK 11 for Gradle/Groovy compatibility)
+    - name: Setup Java (JDK 17 for Android SDK tools)
+      uses: actions/setup-java@v4
+      with:
+        distribution: 'temurin'
+        java-version: '17'
+    
+    - name: Setup Android SDK
+      uses: android-actions/setup-android@v3
+    
+    - name: Switch Java (JDK 11 for Gradle/Groovy compatibility)
       uses: actions/setup-java@v4
       with:
         distribution: 'temurin'
         java-version: '11'
-    
-    - name: Setup Android SDK
-      uses: android-actions/setup-android@v3
     
     - name: Install dependencies
       run: |
