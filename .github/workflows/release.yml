@@ -1,0 +1,180 @@
+name: Release Build
+
+on:
+  release:
+    types: [ published ]
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to build (e.g., 0.6.1.3)'
+        required: true
+        default: '0.6.1.3'
+
+jobs:
+  build-release:
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+        include:
+          - os: ubuntu-latest
+            platform: linux
+            extension: ''
+          - os: windows-latest
+            platform: windows
+            extension: '.exe'
+          - os: macos-latest
+            platform: macos
+            extension: ''
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      with:
+        submodules: recursive
+    
+    - name: Set version
+      run: |
+        if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+          echo "VERSION=${{ github.event.inputs.version }}" >> $GITHUB_ENV
+        else
+          echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_ENV
+        fi
+    
+    - name: Install dependencies (Ubuntu)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y \
+          cmake \
+          build-essential \
+          liballegro5-dev \
+          liballegro-acodec5-dev \
+          liballegro-audio5-dev \
+          liballegro-dialog5-dev \
+          liballegro-font5-dev \
+          liballegro-image5-dev \
+          liballegro-memfile5-dev \
+          liballegro-physfs5-dev \
+          liballegro-primitives5-dev \
+          liballegro-ttf5-dev \
+          libphysfs-dev \
+          libsurgescript-dev \
+          zip
+    
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        brew update
+        brew install cmake allegro physfs surgescript
+    
+    - name: Install dependencies (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        git clone https://github.com/Microsoft/vcpkg.git
+        cd vcpkg
+        .\bootstrap-vcpkg.bat
+        .\vcpkg integrate install
+        .\vcpkg install allegro5:x64-windows physfs:x64-windows surgescript:x64-windows
+    
+    - name: Create build directory
+      run: mkdir build
+      shell: ${{ matrix.os == 'windows-latest' && 'cmd' || 'bash' }}
+    
+    - name: Configure CMake
+      run: |
+        cd build
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+                   -DCMAKE_TOOLCHAIN_FILE=../vcpkg/scripts/buildsystems/vcpkg.cmake \
+                   -DVCPKG_TARGET_TRIPLET=x64-windows \
+                   -DGAME_BUILD_VERSION="release"
+        else
+          cmake .. -DCMAKE_BUILD_TYPE=Release \
+                   -DGAME_BUILD_VERSION="release"
+        fi
+      shell: bash
+    
+    - name: Build
+      run: |
+        cd build
+        if [ "${{ matrix.os }}" = "windows-latest" ]; then
+          cmake --build . --config Release --parallel
+        else
+          make -j$(nproc 2>/dev/null || sysctl -n hw.ncpu 2>/dev/null || echo 2)
+        fi
+      shell: bash
+    
+    - name: Create package directory
+      run: |
+        mkdir -p package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}
+        cp -r characters fonts images inputs languages levels licenses musics quests samples scripts sprites themes package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}/
+        cp LICENSE README.md CHANGES.md CONTRIBUTING.md logo.png surge.png surge.rocks surge.cfg package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}/
+      shell: bash
+    
+    - name: Copy executable (Linux/macOS)
+      if: matrix.os != 'windows-latest'
+      run: |
+        cp build/opensurge package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}/
+      shell: bash
+    
+    - name: Copy executable (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cp build/Release/opensurge.exe package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}/
+      shell: bash
+    
+    - name: Create archive (Linux)
+      if: matrix.os == 'ubuntu-latest'
+      run: |
+        cd package
+        tar -czf opensurge-${{ env.VERSION }}-linux.tar.gz opensurge-${{ env.VERSION }}-linux/
+      shell: bash
+    
+    - name: Create archive (macOS)
+      if: matrix.os == 'macos-latest'
+      run: |
+        cd package
+        tar -czf opensurge-${{ env.VERSION }}-macos.tar.gz opensurge-${{ env.VERSION }}-macos/
+      shell: bash
+    
+    - name: Create archive (Windows)
+      if: matrix.os == 'windows-latest'
+      run: |
+        cd package
+        powershell Compress-Archive -Path opensurge-${{ env.VERSION }}-windows -DestinationPath opensurge-${{ env.VERSION }}-windows.zip
+      shell: bash
+    
+    - name: Upload artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: opensurge-${{ env.VERSION }}-${{ matrix.platform }}
+        path: package/opensurge-${{ env.VERSION }}-${{ matrix.platform }}.*
+        retention-days: 90
+
+  create-release-assets:
+    needs: build-release
+    runs-on: ubuntu-latest
+    if: github.event_name == 'release'
+    
+    steps:
+    - name: Download all artifacts
+      uses: actions/download-artifact@v4
+    
+    - name: Create release directory
+      run: mkdir -p release-assets
+    
+    - name: Organize release assets
+      run: |
+        find . -name "*.tar.gz" -exec cp {} release-assets/ \;
+        find . -name "*.zip" -exec cp {} release-assets/ \;
+        ls -la release-assets/
+    
+    - name: Upload to release
+      uses: softprops/action-gh-release@v1
+      with:
+        files: release-assets/*
+        draft: false
+        prerelease: false
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
