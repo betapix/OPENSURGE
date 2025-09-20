@@ -41,31 +41,26 @@ cd build/stage/libs
 
 # Download AdMob AAR with retry mechanism
 if [[ ! -e "play-services-ads-22.6.0.aar" ]]; then
-    echo "Downloading play-services-ads-22.6.0.aar..."
-    for i in {1..3}; do
+    echo "Downloading play-services-ads-22.6.0.aar for testing..."
+    for i in {1..5}; do
+        echo "Download attempt $i/5..."
         if curl -L --connect-timeout 30 --max-time 300 -o play-services-ads-22.6.0.aar "https://dl.google.com/dl/android/maven2/com/google/android/gms/play-services-ads/22.6.0/play-services-ads-22.6.0.aar"; then
-            echo "AdMob AAR downloaded successfully"
+            echo "AdMob AAR downloaded successfully for testing"
             break
         else
-            echo "Download attempt $i failed, retrying..."
-            sleep 5
+            echo "Download attempt $i failed, retrying in 10 seconds..."
+            sleep 10
         fi
     done
     
     if [[ ! -e "play-services-ads-22.6.0.aar" ]]; then
-        echo "ERROR: Failed to download AdMob AAR after 3 attempts"
-        echo "Continuing without AdMob support..."
-        cd ../../..
-        # Compile without AdMob
-        "$JAVA_HOME/bin/javac" \
-            -d build/parts/java/build/obj \
-            -source 1.7 \
-            -target 1.7 \
-            -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar" \
-            -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
-            build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
-            build/parts/java/src/java/org/opensurge2d/surgeengine/MainActivity.java
-        exit 0
+        echo "ERROR: Failed to download AdMob AAR after 5 attempts"
+        echo "Trying alternative download URL..."
+        curl -L -o play-services-ads-22.6.0.aar "https://maven.google.com/com/google/android/gms/play-services-ads/22.6.0/play-services-ads-22.6.0.aar" || {
+            echo "ERROR: All download attempts failed"
+            echo "Creating empty AAR for testing..."
+            touch play-services-ads-22.6.0.aar
+        }
     fi
 fi
 
@@ -84,28 +79,16 @@ cd ../../..
 # Compile Java files
 echo "Compiling Java files..."
 
-# Check if AdMob classes are available
-if [[ -e "build/stage/libs/admob-classes.jar" && -s "build/stage/libs/admob-classes.jar" ]]; then
-    echo "Compiling with AdMob support..."
-    "$JAVA_HOME/bin/javac" \
-        -d build/parts/java/build/obj \
-        -source 1.7 \
-        -target 1.7 \
-        -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar:build/stage/libs/admob-classes.jar" \
-        -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
-        build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
-        build/parts/java/src/java/org/opensurge2d/surgeengine/*.java
-else
-    echo "Compiling without AdMob support..."
-    "$JAVA_HOME/bin/javac" \
-        -d build/parts/java/build/obj \
-        -source 1.7 \
-        -target 1.7 \
-        -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar" \
-        -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
-        build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
-        build/parts/java/src/java/org/opensurge2d/surgeengine/MainActivity.java
-fi
+# Compile with AdMob support for testing
+echo "Compiling with AdMob testing support..."
+"$JAVA_HOME/bin/javac" \
+    -d build/parts/java/build/obj \
+    -source 1.7 \
+    -target 1.7 \
+    -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar:build/stage/libs/admob-classes.jar" \
+    -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
+    build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
+    build/parts/java/src/java/org/opensurge2d/surgeengine/*.java
 
 # Generate the DEX bytecode
 echo "Generating DEX bytecode..."
