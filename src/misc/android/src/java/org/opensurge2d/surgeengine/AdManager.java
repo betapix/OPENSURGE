@@ -1,6 +1,6 @@
 /*
  * Open Surge Engine
- * AdManager.java - AdMob Ads Manager
+ * AdManager.java - AdMob Ads Manager (Stub Implementation)
  * Copyright (C) 2024 Abdul Mueed
  * 
  * This program is free software; you can redistribute it and/or modify
@@ -14,41 +14,13 @@ package org.opensurge2d.surgeengine;
 import android.app.Activity;
 import android.content.Context;
 import android.util.Log;
-import android.os.Handler;
-import android.os.Looper;
-
-import com.google.android.gms.ads.AdError;
-import com.google.android.gms.ads.AdRequest;
-import com.google.android.gms.ads.AdView;
-import com.google.android.gms.ads.FullScreenContentCallback;
-import com.google.android.gms.ads.LoadAdError;
-import com.google.android.gms.ads.MobileAds;
-import com.google.android.gms.ads.appopen.AppOpenAd;
-import com.google.android.gms.ads.interstitial.InterstitialAd;
-import com.google.android.gms.ads.interstitial.InterstitialAdLoadCallback;
-import com.google.android.gms.ads.rewarded.RewardedAd;
-import com.google.android.gms.ads.rewarded.RewardedAdLoadCallback;
-import com.google.android.gms.ads.initialization.InitializationStatus;
-import com.google.android.gms.ads.initialization.OnInitializationCompleteListener;
-
-import java.util.Date;
 
 public class AdManager {
     private static final String TAG = "AdManager";
     
-    // Ad Unit IDs - Replace with your actual AdMob Ad Unit IDs
-    private static final String APP_OPEN_AD_UNIT_ID = "ca-app-pub-3940256099942544/3419835294"; // Test ID
-    private static final String INTERSTITIAL_AD_UNIT_ID = "ca-app-pub-3940256099942544/1033173712"; // Test ID
-    private static final String REWARDED_AD_UNIT_ID = "ca-app-pub-3940256099942544/5224354917"; // Test ID
-    
     private static AdManager instance;
     private Activity activity;
     private Context context;
-    
-    // Ads
-    private AppOpenAd appOpenAd;
-    private InterstitialAd interstitialAd;
-    private RewardedAd rewardedAd;
     
     // Timing
     private long lastInterstitialTime = 0;
@@ -83,164 +55,41 @@ public class AdManager {
     }
     
     private void initializeAdMob() {
-        MobileAds.initialize(context, new OnInitializationCompleteListener() {
-            @Override
-            public void onInitializationComplete(InitializationStatus initializationStatus) {
-                Log.d(TAG, "AdMob initialized successfully");
-                loadAppOpenAd();
-                loadInterstitialAd();
-                loadRewardedAd();
-            }
-        });
+        Log.d(TAG, "AdMob initialization skipped - using stub implementation");
+        // Stub implementation - AdMob not available
+        isAppOpenAdAvailable = false;
+        isInterstitialAdAvailable = false;
+        isRewardedAdAvailable = false;
     }
     
-    // App Open Ad Methods
+    // App Open Ad Methods - Stub implementation
     private void loadAppOpenAd() {
-        AdRequest request = new AdRequest.Builder().build();
-        
-        AppOpenAd.load(context, APP_OPEN_AD_UNIT_ID, request, new AppOpenAd.AppOpenAdLoadCallback() {
-            @Override
-            public void onAdLoaded(AppOpenAd ad) {
-                Log.d(TAG, "App Open Ad loaded");
-                appOpenAd = ad;
-                isAppOpenAdAvailable = true;
-                onAppOpenAdLoaded();
-            }
-            
-            @Override
-            public void onAdFailedToLoad(LoadAdError loadAdError) {
-                Log.d(TAG, "App Open Ad failed to load: " + loadAdError.getMessage());
-                isAppOpenAdAvailable = false;
-                onAppOpenAdFailedToLoad();
-            }
-        });
+        Log.d(TAG, "App Open Ad loading skipped - stub implementation");
+        isAppOpenAdAvailable = false;
     }
     
     public void showAppOpenAd() {
-        if (appOpenAd != null && isAppOpenAdAvailable) {
-            appOpenAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    Log.d(TAG, "App Open Ad dismissed");
-                    appOpenAd = null;
-                    isAppOpenAdAvailable = false;
-                    onAppOpenAdClosed();
-                    loadAppOpenAd(); // Load next ad
-                }
-                
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-                    Log.d(TAG, "App Open Ad failed to show: " + adError.getMessage());
-                    appOpenAd = null;
-                    isAppOpenAdAvailable = false;
-                    loadAppOpenAd(); // Load next ad
-                }
-            });
-            
-            appOpenAd.show(activity);
-        }
+        Log.d(TAG, "App Open Ad show skipped - stub implementation");
     }
     
-    // Interstitial Ad Methods
+    // Interstitial Ad Methods - Stub implementation
     private void loadInterstitialAd() {
-        AdRequest request = new AdRequest.Builder().build();
-        
-        InterstitialAd.load(context, INTERSTITIAL_AD_UNIT_ID, request, new InterstitialAdLoadCallback() {
-            @Override
-            public void onAdLoaded(InterstitialAd ad) {
-                Log.d(TAG, "Interstitial Ad loaded");
-                interstitialAd = ad;
-                isInterstitialAdAvailable = true;
-                onInterstitialAdLoaded();
-            }
-            
-            @Override
-            public void onAdFailedToLoad(LoadAdError loadAdError) {
-                Log.d(TAG, "Interstitial Ad failed to load: " + loadAdError.getMessage());
-                isInterstitialAdAvailable = false;
-                onInterstitialAdFailedToLoad();
-            }
-        });
+        Log.d(TAG, "Interstitial Ad loading skipped - stub implementation");
+        isInterstitialAdAvailable = false;
     }
     
     public void showInterstitialAd() {
-        long currentTime = System.currentTimeMillis();
-        
-        if (interstitialAd != null && isInterstitialAdAvailable && 
-            (currentTime - lastInterstitialTime) >= INTERSTITIAL_INTERVAL) {
-            
-            interstitialAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    Log.d(TAG, "Interstitial Ad dismissed");
-                    interstitialAd = null;
-                    isInterstitialAdAvailable = false;
-                    lastInterstitialTime = currentTime;
-                    onInterstitialAdClosed();
-                    loadInterstitialAd(); // Load next ad
-                }
-                
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-                    Log.d(TAG, "Interstitial Ad failed to show: " + adError.getMessage());
-                    interstitialAd = null;
-                    isInterstitialAdAvailable = false;
-                    loadInterstitialAd(); // Load next ad
-                }
-            });
-            
-            interstitialAd.show(activity);
-        }
+        Log.d(TAG, "Interstitial Ad show skipped - stub implementation");
     }
     
-    // Rewarded Ad Methods
+    // Rewarded Ad Methods - Stub implementation
     private void loadRewardedAd() {
-        AdRequest request = new AdRequest.Builder().build();
-        
-        RewardedAd.load(context, REWARDED_AD_UNIT_ID, request, new RewardedAdLoadCallback() {
-            @Override
-            public void onAdLoaded(RewardedAd ad) {
-                Log.d(TAG, "Rewarded Ad loaded");
-                rewardedAd = ad;
-                isRewardedAdAvailable = true;
-                onRewardedAdLoaded();
-            }
-            
-            @Override
-            public void onAdFailedToLoad(LoadAdError loadAdError) {
-                Log.d(TAG, "Rewarded Ad failed to load: " + loadAdError.getMessage());
-                isRewardedAdAvailable = false;
-                onRewardedAdFailedToLoad();
-            }
-        });
+        Log.d(TAG, "Rewarded Ad loading skipped - stub implementation");
+        isRewardedAdAvailable = false;
     }
     
     public void showRewardedAd() {
-        if (rewardedAd != null && isRewardedAdAvailable) {
-            rewardedAd.setFullScreenContentCallback(new FullScreenContentCallback() {
-                @Override
-                public void onAdDismissedFullScreenContent() {
-                    Log.d(TAG, "Rewarded Ad dismissed");
-                    rewardedAd = null;
-                    isRewardedAdAvailable = false;
-                    onRewardedAdClosed();
-                    loadRewardedAd(); // Load next ad
-                }
-                
-                @Override
-                public void onAdFailedToShowFullScreenContent(AdError adError) {
-                    Log.d(TAG, "Rewarded Ad failed to show: " + adError.getMessage());
-                    rewardedAd = null;
-                    isRewardedAdAvailable = false;
-                    loadRewardedAd(); // Load next ad
-                }
-            });
-            
-            rewardedAd.show(activity, rewardItem -> {
-                Log.d(TAG, "Rewarded Ad earned reward: " + rewardItem.getAmount() + " " + rewardItem.getType());
-                onRewardedAdEarnedReward();
-            });
-        }
+        Log.d(TAG, "Rewarded Ad show skipped - stub implementation");
     }
     
     // Public methods for native calls
@@ -257,13 +106,11 @@ public class AdManager {
     }
     
     public void onAppPause() {
-        // Show app open ad when app comes to foreground
-        if (isAppOpenAdAvailable) {
-            showAppOpenAd();
-        }
+        Log.d(TAG, "App pause - stub implementation");
     }
     
     public void onAppResume() {
+        Log.d(TAG, "App resume - stub implementation");
         // Load ads when app resumes
         if (!isAppOpenAdAvailable) {
             loadAppOpenAd();
@@ -277,11 +124,13 @@ public class AdManager {
     }
     
     public void onGameOver() {
+        Log.d(TAG, "Game over - stub implementation");
         // Show rewarded ad on game over
         showRewardedAd();
     }
     
     public void checkInterstitialTimer() {
+        Log.d(TAG, "Interstitial timer check - stub implementation");
         // Check if 2 minutes have passed and show interstitial
         long currentTime = System.currentTimeMillis();
         if ((currentTime - lastInterstitialTime) >= INTERSTITIAL_INTERVAL) {
