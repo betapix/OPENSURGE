@@ -31,6 +31,11 @@ static surgescript_var_t* fun_main(surgescript_object_t* object, const surgescri
 static surgescript_var_t* fun_destroy(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_spawn(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 static surgescript_var_t* fun_sharetext(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_showinterstitial(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_showrewarded(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_checkinterstitialtimer(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_isinterstitialready(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
+static surgescript_var_t* fun_isrewardedready(surgescript_object_t* object, const surgescript_var_t** param, int num_params);
 
 
 
@@ -45,6 +50,13 @@ void scripting_register_androidplatform(surgescript_vm_t* vm)
     surgescript_vm_bind(vm, "AndroidPlatform", "spawn", fun_spawn, 1);
 
     surgescript_vm_bind(vm, "AndroidPlatform", "shareText", fun_sharetext, 1);
+    
+    // Ads methods
+    surgescript_vm_bind(vm, "AndroidPlatform", "showInterstitialAd", fun_showinterstitial, 0);
+    surgescript_vm_bind(vm, "AndroidPlatform", "showRewardedAd", fun_showrewarded, 0);
+    surgescript_vm_bind(vm, "AndroidPlatform", "checkInterstitialTimer", fun_checkinterstitialtimer, 0);
+    surgescript_vm_bind(vm, "AndroidPlatform", "isInterstitialAdReady", fun_isinterstitialready, 0);
+    surgescript_vm_bind(vm, "AndroidPlatform", "isRewardedAdReady", fun_isrewardedready, 0);
 }
 
 
@@ -98,6 +110,121 @@ surgescript_var_t* fun_sharetext(surgescript_object_t* object, const surgescript
 
     /* do nothing if the engine is not running on Android */
     return NULL;
+
+#endif
+}
+
+/* showInterstitialAd */
+static surgescript_var_t* fun_showinterstitial(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = (JNIEnv*)allegro_android_get_jni_env();
+    jobject activity = (jobject)allegro_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showInterstitialAd", "()V");
+    (*env)->CallVoidMethod(env, activity, method_id);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return NULL;
+
+#else
+
+    /* do nothing if the engine is not running on Android */
+    return NULL;
+
+#endif
+}
+
+/* showRewardedAd */
+static surgescript_var_t* fun_showrewarded(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = (JNIEnv*)allegro_android_get_jni_env();
+    jobject activity = (jobject)allegro_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "showRewardedAd", "()V");
+    (*env)->CallVoidMethod(env, activity, method_id);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return NULL;
+
+#else
+
+    /* do nothing if the engine is not running on Android */
+    return NULL;
+
+#endif
+}
+
+/* checkInterstitialTimer */
+static surgescript_var_t* fun_checkinterstitialtimer(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = (JNIEnv*)allegro_android_get_jni_env();
+    jobject activity = (jobject)allegro_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "checkInterstitialTimer", "()V");
+    (*env)->CallVoidMethod(env, activity, method_id);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return NULL;
+
+#else
+
+    /* do nothing if the engine is not running on Android */
+    return NULL;
+
+#endif
+}
+
+/* isInterstitialAdReady */
+static surgescript_var_t* fun_isinterstitialready(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = (JNIEnv*)allegro_android_get_jni_env();
+    jobject activity = (jobject)allegro_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "isInterstitialAdReady", "()Z");
+    jboolean result = (*env)->CallBooleanMethod(env, activity, method_id);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return surgescript_var_set_bool(surgescript_var_create(), result == JNI_TRUE);
+
+#else
+
+    /* return false if the engine is not running on Android */
+    return surgescript_var_set_bool(surgescript_var_create(), false);
+
+#endif
+}
+
+/* isRewardedAdReady */
+static surgescript_var_t* fun_isrewardedready(surgescript_object_t* object, const surgescript_var_t** param, int num_params)
+{
+#if defined(__ANDROID__)
+
+    JNIEnv* env = (JNIEnv*)allegro_android_get_jni_env();
+    jobject activity = (jobject)allegro_android_get_activity();
+
+    jclass class_id = (*env)->GetObjectClass(env, activity);
+    jmethodID method_id = (*env)->GetMethodID(env, class_id, "isRewardedAdReady", "()Z");
+    jboolean result = (*env)->CallBooleanMethod(env, activity, method_id);
+    (*env)->DeleteLocalRef(env, class_id);
+
+    return surgescript_var_set_bool(surgescript_var_create(), result == JNI_TRUE);
+
+#else
+
+    /* return false if the engine is not running on Android */
+    return surgescript_var_set_bool(surgescript_var_create(), false);
 
 #endif
 }

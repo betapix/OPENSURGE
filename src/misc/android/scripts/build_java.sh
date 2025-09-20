@@ -34,13 +34,30 @@ mkdir -p build/parts/java/build/src
     -M build/parts/java/src/AndroidManifest.xml \
     -I "$SDK_PLATFORM/android.jar"
 
+# Download AdMob dependencies
+echo "Downloading AdMob dependencies..."
+mkdir -p build/stage/libs
+cd build/stage/libs
+
+# Download AdMob AAR
+if [[ ! -e "play-services-ads-22.6.0.aar" ]]; then
+    echo "Downloading play-services-ads-22.6.0.aar..."
+    curl -L -o play-services-ads-22.6.0.aar "https://dl.google.com/dl/android/maven2/com/google/android/gms/play-services-ads/22.6.0/play-services-ads-22.6.0.aar"
+fi
+
+# Extract AdMob classes
+unzip -o play-services-ads-22.6.0.aar classes.jar
+mv classes.jar admob-classes.jar
+
+cd ../../..
+
 # Compile Java files
 echo "Compiling Java files..."
 "$JAVA_HOME/bin/javac" \
     -d build/parts/java/build/obj \
     -source 1.7 \
     -target 1.7 \
-    -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar" \
+    -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar:build/stage/libs/admob-classes.jar" \
     -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
     build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
     build/parts/java/src/java/org/opensurge2d/surgeengine/*.java

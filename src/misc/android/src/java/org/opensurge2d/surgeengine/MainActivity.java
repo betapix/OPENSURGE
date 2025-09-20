@@ -35,6 +35,7 @@ import java.io.File;
 public class MainActivity extends AllegroActivity
 {
     private static final String TAG = "opensurge";
+    private AdManager adManager;
     
     static void loadLibrary(String name)
     {
@@ -144,11 +145,85 @@ public class MainActivity extends AllegroActivity
         // Android TV: auto low latency mode
         if(Build.VERSION.SDK_INT >= 30)
             win.setPreferMinimalPostProcessing(true);
+            
+        // Initialize AdManager
+        adManager = AdManager.getInstance(this);
     }
 
-    @Override public void onPause() { Log.d(TAG, "<onPause>"); super.onPause(); Log.d(TAG, "</onPause>"); }
-    @Override public void onResume() { Log.d(TAG, "<onResume>"); super.onResume(); Log.d(TAG, "</onResume>"); }
-    @Override public void onStop() { Log.d(TAG, "<onStop>"); super.onStop(); Log.d(TAG, "</onStop>"); }
-    @Override public void onStart() { Log.d(TAG, "<onStart>"); super.onStart(); Log.d(TAG, "</onStart>"); }
-    @Override public void onRestart() { Log.d(TAG, "<onRestart>"); super.onRestart(); Log.d(TAG, "</onRestart>"); }
+    @Override 
+    public void onPause() { 
+        Log.d(TAG, "<onPause>"); 
+        if (adManager != null) {
+            adManager.onAppPause();
+        }
+        super.onPause(); 
+        Log.d(TAG, "</onPause>"); 
+    }
+    
+    @Override 
+    public void onResume() { 
+        Log.d(TAG, "<onResume>"); 
+        super.onResume(); 
+        if (adManager != null) {
+            adManager.onAppResume();
+        }
+        Log.d(TAG, "</onResume>"); 
+    }
+    
+    @Override 
+    public void onStop() { 
+        Log.d(TAG, "<onStop>"); 
+        super.onStop(); 
+        Log.d(TAG, "</onStop>"); 
+    }
+    
+    @Override 
+    public void onStart() { 
+        Log.d(TAG, "<onStart>"); 
+        super.onStart(); 
+        Log.d(TAG, "</onStart>"); 
+    }
+    
+    @Override 
+    public void onRestart() { 
+        Log.d(TAG, "<onRestart>"); 
+        super.onRestart(); 
+        Log.d(TAG, "</onRestart>"); 
+    }
+    
+    @Override
+    public void onBackPressed() {
+        // Show app close ad when back button is pressed
+        if (adManager != null && adManager.isAppOpenAdReady()) {
+            adManager.showAppOpenAd();
+        }
+        super.onBackPressed();
+    }
+    
+    // Native methods for ads control
+    public void showInterstitialAd() {
+        if (adManager != null) {
+            adManager.showInterstitialAd();
+        }
+    }
+    
+    public void showRewardedAd() {
+        if (adManager != null) {
+            adManager.onGameOver();
+        }
+    }
+    
+    public void checkInterstitialTimer() {
+        if (adManager != null) {
+            adManager.checkInterstitialTimer();
+        }
+    }
+    
+    public boolean isInterstitialAdReady() {
+        return adManager != null && adManager.isInterstitialAdReady();
+    }
+    
+    public boolean isRewardedAdReady() {
+        return adManager != null && adManager.isRewardedAdReady();
+    }
 }
