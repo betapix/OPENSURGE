@@ -156,7 +156,6 @@ if [[ -e "build/stage/libs/admob-classes.jar" && -s "build/stage/libs/admob-clas
     "$SDK_BUILD_TOOLS/d8" \
         --output build/parts/java/build \
         --lib "$SDK_PLATFORM/android.jar" \
-        build/stage/libs/classes.jar \
         build/stage/libs/admob-classes.jar \
         build/parts/java/build/obj/org/opensurge2d/surgeengine/*.class
 else
@@ -164,7 +163,6 @@ else
     "$SDK_BUILD_TOOLS/d8" \
         --output build/parts/java/build \
         --lib "$SDK_PLATFORM/android.jar" \
-        build/stage/libs/classes.jar \
         build/parts/java/build/obj/org/opensurge2d/surgeengine/*.class
 fi
 
