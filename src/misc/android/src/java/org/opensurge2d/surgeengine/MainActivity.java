@@ -20,7 +20,7 @@
 
 package org.opensurge2d.surgeengine;
 
-import org.liballeg.android.AllegroActivity;
+import android.app.Activity;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Build;
@@ -32,7 +32,7 @@ import android.view.Window;
 import android.widget.Toast;
 import java.io.File;
 
-public class MainActivity extends AllegroActivity
+public class MainActivity extends Activity
 {
     private static final String TAG = "opensurge";
     private AdManager adManager;
@@ -66,7 +66,9 @@ public class MainActivity extends AllegroActivity
 
     public MainActivity()
     {
-        super("libopensurge.so");
+        super();
+        // Load the native library
+        System.loadLibrary("opensurge");
     }
 
     public void openWebPage(String url)
