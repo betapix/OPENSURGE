@@ -123,22 +123,50 @@ echo "Compiling Java files..."
 
 # Compile with AdMob support for testing
 echo "Compiling with AdMob testing support..."
-"$JAVA_HOME/bin/javac" \
-    -d build/parts/java/build/obj \
-    -source 1.7 \
-    -target 1.7 \
-    -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar:build/stage/libs/admob-classes.jar" \
-    -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
-    build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
-    build/parts/java/src/java/org/opensurge2d/surgeengine/*.java
+
+# Check if admob-classes.jar exists and is not empty
+if [[ -e "build/stage/libs/admob-classes.jar" && -s "build/stage/libs/admob-classes.jar" ]]; then
+    echo "Compiling with AdMob classes..."
+    "$JAVA_HOME/bin/javac" \
+        -d build/parts/java/build/obj \
+        -source 1.7 \
+        -target 1.7 \
+        -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar:build/stage/libs/admob-classes.jar" \
+        -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
+        build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
+        build/parts/java/src/java/org/opensurge2d/surgeengine/*.java
+else
+    echo "Compiling without AdMob classes (using stub implementation)..."
+    "$JAVA_HOME/bin/javac" \
+        -d build/parts/java/build/obj \
+        -source 1.7 \
+        -target 1.7 \
+        -classpath "$SDK_PLATFORM/android.jar:build/stage/libs/classes.jar" \
+        -sourcepath build/parts/java/src/java/org/opensurge2d/surgeengine \
+        build/parts/java/build/src/org/opensurge2d/surgeengine/R.java \
+        build/parts/java/src/java/org/opensurge2d/surgeengine/*.java
+fi
 
 # Generate the DEX bytecode
 echo "Generating DEX bytecode..."
-"$SDK_BUILD_TOOLS/d8" \
-    --output build/parts/java/build \
-    --lib "$SDK_PLATFORM/android.jar" \
-    build/stage/libs/classes.jar \
-    build/parts/java/build/obj/org/opensurge2d/surgeengine/*.class
+
+# Check if admob-classes.jar exists and is not empty for DEX generation
+if [[ -e "build/stage/libs/admob-classes.jar" && -s "build/stage/libs/admob-classes.jar" ]]; then
+    echo "Generating DEX with AdMob classes..."
+    "$SDK_BUILD_TOOLS/d8" \
+        --output build/parts/java/build \
+        --lib "$SDK_PLATFORM/android.jar" \
+        build/stage/libs/classes.jar \
+        build/stage/libs/admob-classes.jar \
+        build/parts/java/build/obj/org/opensurge2d/surgeengine/*.class
+else
+    echo "Generating DEX without AdMob classes..."
+    "$SDK_BUILD_TOOLS/d8" \
+        --output build/parts/java/build \
+        --lib "$SDK_PLATFORM/android.jar" \
+        build/stage/libs/classes.jar \
+        build/parts/java/build/obj/org/opensurge2d/surgeengine/*.class
+fi
 
 # Success!
 echo "The Java part has been built!"
