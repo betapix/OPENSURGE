@@ -50,6 +50,7 @@ public class MainActivity extends Activity
 
     static
     {
+        // Load Allegro libraries first
         loadLibrary("physfs");
         loadLibrary("allegro");
         loadLibrary("allegro_primitives");
@@ -62,13 +63,15 @@ public class MainActivity extends Activity
         loadLibrary("allegro_dialog");
         loadLibrary("allegro_memfile");
         loadLibrary("allegro_physfs");
+        
+        // Load main game library last
+        loadLibrary("opensurge");
     }
 
     public MainActivity()
     {
         super();
-        // Load the native library
-        System.loadLibrary("opensurge");
+        Log.d(TAG, "MainActivity constructor called");
     }
 
     public void openWebPage(String url)
@@ -148,8 +151,17 @@ public class MainActivity extends Activity
         if(Build.VERSION.SDK_INT >= 30)
             win.setPreferMinimalPostProcessing(true);
             
+        // Set background color to prevent black screen
+        win.setBackgroundDrawableResource(android.R.color.black);
+        
         // Initialize AdManager
         adManager = AdManager.getInstance(this);
+        
+        // Log for debugging
+        Log.d(TAG, "MainActivity onCreate completed");
+        
+        // Show toast to confirm app is working
+        showToast("Open Surge Engine Starting...");
     }
 
     @Override 
